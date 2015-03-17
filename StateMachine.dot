@@ -1,0 +1,66 @@
+digraph finite_state_machine {
+	label="StateMachine";
+	fontsize=12;
+	size="200"
+	node [shape = doublecircle]; Start Exit;
+	node [shape = box];
+	//rankdir=LR;
+	//splines="ortho";
+	//layout=sfdp;
+	//k=1;
+	//len=3;
+
+	//VERTEX-STATES
+	Fetch_next_word[label = "Fetch_next_word\n-If word is longer than 2 char and\nends with ';', then remove ';'"];
+	Start[label = "START"];
+	Found_TITLE[label = "Found_TITLE\n-Set the word as TITLE.\n-Print the TITLE for .dot file.\n-Scan next word.\n-Is next word a 'OF' statement?"];
+	Found_NODE[label = "Found_NODE\n-Set the word as NODE.\n-Is TITLE <> NULL?"];
+	Found_TRANSITION[label = "Found_TRANSITION\n-Is next word a ':=' statment?"];
+	Print_TRANSITION[label = "Print_TRANSITION\n-Print the actual NODE as origin and\nthe TRANSITION as destination"];
+	Fault[label = "FAULT"];
+	Exit[label = "EXIT"];
+
+	//EDGE
+	Start -> Fetch_next_word
+	[ label = "LinkedListReady" ];
+
+	Fetch_next_word -> Found_TITLE
+	[ label = "Found CASE" ];
+
+	Fetch_next_word	-> Found_NODE
+	[ label = "Found NODE:" ];
+
+	Fetch_next_word -> Found_TRANSITION
+	[ label = "Word==TITLE" ];
+
+	Fetch_next_word -> Fetch_next_word
+	[ label = "No keywords" ];
+
+	Fetch_next_word	-> Exit
+	[ label = "Found END_CASE" ];
+
+	Found_TITLE -> Fault
+	[ label = "NO\nFAULT=CASE" ]; //found CASE but not OF
+
+	Found_TITLE -> Fetch_next_word
+	[ label = "YES" ];
+
+	Found_NODE -> Fault
+	[ label = "NO\nFAULT=NODE" ]; //found NODE before TITILE
+
+	Found_NODE -> Fetch_next_word
+	[ label = "YES" ];
+
+	Found_TRANSITION -> Print_TRANSITION
+	[ label = "YES" ];
+
+	Found_TRANSITION -> Fault
+	[ label = "NO\nFAULT=TRANSITION" ]; //found a word == TITLE, but no assignment after that
+
+	Print_TRANSITION -> Fetch_next_word
+	[ label = "Continue" ];
+
+	Fault -> Exit
+	[ label = "Return fault\nCASE/NODE/TRANSITION" ];
+}
+
