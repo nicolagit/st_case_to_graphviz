@@ -3,16 +3,18 @@
 #include <string.h>
 #include <stdbool.h>
 
-
-FILE *in_file;
-
+/**
+ * Structure of a word
+ */
 typedef struct word {
 	int pos;
 	char *text;
-	struct word *prev;
-	struct word *next;
+	struct word *prev, *next;
 } word;
 
+/**
+ * Create a new word from the original "word" structure
+ */
 word* create(int pos, char *text, word *prev) {
 	word *w = malloc(sizeof(word));
 	w->pos = pos;
@@ -21,11 +23,11 @@ word* create(int pos, char *text, word *prev) {
 	return w;
 }
 
-void readfile(FILE *in_file){
-	word *start = NULL;
-	word *w = NULL;
-	word *prev = NULL;
-	word *next = NULL;
+/**
+ * Create a linked list from the file content
+ */
+word* readfile(FILE *in_file){
+	word *start=NULL, *w=NULL, *prev=NULL, *next=NULL;
 	char string[150];
 	int posread=1;
 	for (; fscanf(in_file, "%s", &string) == 1; w=next) {
@@ -36,24 +38,27 @@ void readfile(FILE *in_file){
 		if (w != NULL)
 			w->next = next;
 	}
+	return start;
 }
 
+/**
+ * M A I N
+ */
 int main(int argc, char *argv[]) {
-
-	// Open the input file (with sanity check)
+	FILE *in_file;
+	word *startword;
+	// Open the input file (with a basic sanity check)
 	if (argc != 2) {
-		fprintf(stderr, "Provide the name of the file to parse\n");
+		fprintf(stderr, "Provide the name of the file\n");
 		return 1;
 	}
 	in_file = fopen(argv[1], "r");
 	if (in_file == NULL) {
-		fprintf(stderr, "Can't open the file");
+		fprintf(stderr, "Can't open the file\n");
 		return 1;
 	}
 
-	// Create a linked list from the file contect
-	readfile(in_file);	
-
-	// Close files and free up memory
+	// Create a linked list from the file content and close the file
+	startword = readfile(in_file);	
 	fclose(in_file);
 }
