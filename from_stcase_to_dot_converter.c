@@ -4,6 +4,40 @@
 #include <stdbool.h>
 
 /**
+ * GLOBALS
+ */
+char *title;
+
+/**
+ * Check if a string ends with ";"
+ */
+int check_end_with_semicolon_and_remove_it(char *pntword){
+	while (*pntword != '\0') {
+		if (*pntword == ';') {
+			*pntword = '\0';
+			return 1;
+			break;
+		}
+		pntword++;
+		return 0;
+	}
+}
+
+/**
+ * Check if a string ends with ":"
+ */
+int check_end_with_colon_and_remove_it(char *pntword){
+	while (*pntword != '\0') {
+		if (*pntword == ':') {
+		       *pntword = '\0';
+		       return 1;
+		       break;
+		}pntword++;
+		return 0;
+	}
+}
+
+/**
  * Structure of a word
  */
 typedef struct word {
@@ -22,10 +56,14 @@ word* create(int pos, char *text, word *prev) {
 	return w;
 }
 /**
+ * The initial word is here, for global access
+ */
+word *start=NULL;
+/**
  * Create a linked list from the file content
  */
 word* readfile(FILE *in_file){
-	word *start=NULL, *w=NULL, *prev=NULL, *next=NULL;
+	word *w=NULL, *prev=NULL, *next=NULL;
 	char string[150];
 	int posread=1;
 	for (; fscanf(in_file, "%s", &string) == 1; w=next) {
@@ -89,12 +127,26 @@ StateMachineType StateMachine[] = {
  * Functions for the state machine
  */
 void Fun_s0_START(void) {
-	//ADD THE CODE HERE!!!
-	//StateMachineActual = s0_START;
+	if (start != NULL) {
+		StateMachineActual = s1_Fetch_Next_Word;
+	} else {
+		//Fault data not recorded from file
+	}
 }
 void Fun_s1_Fetch_Next_Word(void) {
-	//ADD THE CODE HERE!!!
-	//StateMachineActual = 
+	word *w = start;
+	int found_semicolon, found_colon;
+	found_semicolon = check_end_with_semicolon_and_remove_it(w->text);
+	found_colon = check_end_with_colon_and_remove_it(w->text);
+	if (w->text == "CASE") {
+		StateMachineActual = s2_Found_TITLE;
+	}
+	if (found_colon == 1) {
+		StateMachineActual = s3_Found_NODE;
+	}
+	if (w->text == title) {
+		StateMachineActual = s4_Found_TRANSITION;
+	}
 }
 void Fun_s2_Found_TITLE(void) {
 	//ADD THE CODE HERE!!!
